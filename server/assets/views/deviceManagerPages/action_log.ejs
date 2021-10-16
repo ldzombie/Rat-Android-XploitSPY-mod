@@ -1,0 +1,47 @@
+<div class="ui segment">
+    <div class="ui secondary menu" style="
+        margin-left: 0!important;
+        margin-right: 0!important;">
+        <div class="right menu">
+            <a href="actions" class="ui blue button">Clear Filter</a>
+            <button onclick="updateButton(this, '0xAL')" class="ui blue button"> <i
+                    class="icon sync"></i>Update</button>
+        </div>
+    </div>
+    <table class="ui sortable celled table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Package</th>
+                <th>Text</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pageData.forEach((action) => { 
+                let date = new Date(parseInt(action.time));
+            %>
+            <tr>
+                <td class="collapsing"><%= date.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></td>
+                <td class="collapsing" title="<%= action.type %>"><a
+                        href="?filter=<%= action.type %>"><%= action.type.substring(0,24) %></a>
+                </td>
+                <td class="collapsing"><%=action.package %></td>
+				<td class="collapsing">
+                <div class="info">
+				  <input id="info__body_1" class="info__switch" type="checkbox">
+				  <label for="info__body_1" class="info__headline"><%=action.text.substring(0,30) %></label>
+				  <div class="info__body">
+				    <%=action.text %>
+				  </div>
+				</div></td>
+                <!--<td class="collapsing">...</td>-->
+                
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    $('table').tablesort();
+</script>

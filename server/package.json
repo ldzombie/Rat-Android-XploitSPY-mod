@@ -1,0 +1,29 @@
+{
+    "name": "SpyZed",
+    "version": "1.0.0",
+    "description": "SpyZed - Remote Android",
+    "main": "index.js",
+    "scripts": {
+        "start": "node server/index.js",
+        "test": "node server/index.js",
+        "dev": "nodemon"
+    },
+    "author": "Ldz",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cookie-parser": "^1.4.4",
+        "ejs": "^2.6.2",
+        "express": "^4.17.1",
+        "express-async-handler": "^1.1.4",
+        "express-pino-logger": "^5.0.0",
+        "fs-extra": "^9.0.1",
+        "geoip-lite": "^1.3.7",
+        "locutus": "^2.0.11",
+        "lowdb": "^1.0.0",
+        "node-fetch": "^2.6.0",
+        "pino": "^6.3.2",
+        "shelljs": "^0.8.4",
+        "socket.io": "^2.2.0"
+    }
+}

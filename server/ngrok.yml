@@ -1,0 +1,7 @@
+authtoken: 1eB196GfXnaWKwebmtcnZnaUB3i_2BQTDZLyku4dUBvFPZpy3
+region: eu
+tunnels:
+    test:
+        proto: http
+        addr: 80
+        hostname: test.ngrok.io
