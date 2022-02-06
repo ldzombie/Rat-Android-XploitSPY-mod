@@ -41,11 +41,14 @@
                 	<img id="btmImage" src="data:image/png;base64,<%=item.imgData%>" style="margin:10px;" alt="<%=item.name %>" class="btmImage" <% if(deleted){ %> title="Изображение удалено" <% } %> > 
                 	<div class="mf_btnhidden" <% if(deleted){ %> hidden title="Изображение удалено" <% } %>>
                 		<button class="ui icon button" title="Скачать эту картинку" onclick="save('<%=item.path %>') ">
-            				<i class="icon download"></i>
+            				<i class="icon download" style="margin: 0 0.42857143em 0 -0.21428571em!important"></i>
 	                	</button>
 	                	<button class="ui icon button" title="Установить как обои" onclick="setWall('<%=item.path %>') ">
-	                		<i class="image icon"></i>
+	                		<i class="image icon" style="margin: 0 0.42857143em 0 -0.21428571em!important;"></i>
 	                	</button>
+                        <button class="ui icon button" title="Удалить" onclick="delFile('<%=item.path %>') ">
+                            <i class="cut icon" style="margin: 0 0.42857143em 0 -0.21428571em!important;"></i>
+                        </button>
                 	</div>
 
                 </div>
@@ -93,6 +96,26 @@
             }
         });
     }
+    function delFile(path){
+
+        sendCommand('0xMF', {
+            action: 'dF',
+            path
+        }, (error, message) => {
+            if (error) {
+                setTimeout(() => {
+                    showNotification('#f03434', error)
+                }, 300)
+            } else {
+                if (message === 'Requested') {
+                    setTimeout(() => {
+                        showNotification('#2ecc71', 'Delete file '+ name);
+                    }, 300)
+                }
+            }
+        });
+    }
+
 
     function setWall(path){
 

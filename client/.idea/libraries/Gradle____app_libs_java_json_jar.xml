@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: __local_aars__:E.\documents\client\app\libs\java-json.jar:unspecified@jar">
+  <library name="Gradle: ./app/libs/java-json.jar">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/app/libs/java-json.jar!/" />
     </CLASSES>

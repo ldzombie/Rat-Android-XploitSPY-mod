@@ -1,5 +1,6 @@
 package com.remote.app.Managers.DeviceControl;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioManager;
 
@@ -35,6 +36,7 @@ public class Audio {
         catch (Exception e){return null;}
     }
 
+    @SuppressLint("NewApi")
     public static JSONObject getMinMaxVolume(Context context){
         JSONObject info = new JSONObject();
         try{

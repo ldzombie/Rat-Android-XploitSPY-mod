@@ -74,7 +74,9 @@
 	width: 33px;
 	height: 33px;
 }
-
+.mf_btnhidden.button.i{
+	margin: 0 0.42857143em 0 -0.21428571em!important;
+}
 
 .ui.sortable.table thead th{
   color:white!important;

@@ -4,7 +4,7 @@
         <div class="statistic" style="margin-right: 20px;">
             <div class="text value">
             	First Seen<br>
-            	<% let dateFirst = new Date(pageData[1].firstSeen);
+            	<%  let dateFirst = new Date(pageData[1].firstSeen);
             	   let dateLast = new Date(pageData[1].lastSeen);  %>
             	<p><%= dateFirst.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }) %></p>
 

